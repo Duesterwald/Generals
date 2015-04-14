@@ -33,7 +33,7 @@
 	end
 
 	function HexVec._mt.__unm(a)
-		return HexVec.new(-a[1], -a[2])
+		return HexVec.new({-a[1], -a[2]})
 	end
 
 	function HexVec._mt.__sub(a,b)
@@ -71,17 +71,27 @@
 		HexVec.new({-1, 0})
 	}
 
-	local keep_offset = {}
-	for i,vec in ipairs(adjacent_offset) do
-		keep_offset[i] = vec * map_size
+	local attack = HexVec.new(a.x1, a.y1)
+	local defend = HexVec.new(a.x2, a.y2)
+
+	local atkdir = defend - attack
+
+	local keep_offset, map_center = nil
+
+	if atkdir[1] == 0 then
+		keep_offset = HexVec.new(math.ceil(3/2*map_size), 1 + math.ceil(map_size/4))
+		map_center = {1, 1} + (adjacent_offset[4] * map_size) + keep_offset
+	else
+		keep_offset = HexVec.new( 1 + math.ceil(map_size/2), 1 + math.ceil(map_size/4))
+		map_center = {1, 1} + (adjacent_offset[3] * map_size) + keep_offset
 	end
 
-	local keep_pos = HexVec.new( 2 + math.ceil(map_size/4), 2 + math.ceil(map_size/6) )
-
-	local keep = { keep_pos, keep_pos + keep_offset[3] }
-	local map_dim = { x = keep[2].x + keep_pos.x - 1, y = keep[2].y + keep_pos.y - 1}
+	local map_dim = HexVec.new(map_center.x*2-1, map_center.y*2-1)
+	
+	local keep = { map_center - atkdir * map_size, map_center + atkdir * map_size }
 
 	--! Returns an iterator over adjacent locations that can be used in a for-in loop.
+	-- needs map_dim, so it can be before
 	local function adjacent_tiles(v)
 		local i = 1
 		return function()
@@ -104,9 +114,9 @@
 		end
 	end
 
-	local rd = HexVec.new(keep_pos)
-	for i = 1,map_size do
-		rd = rd + adjacent_offset[3]
+	local rd = HexVec.new(keep[1])
+	for i = 0,2*map_size do
+		rd = rd + atkdir
 		map[rd.x][rd.y] = "Rd"
 	end
 
@@ -116,7 +126,7 @@
 			map[u.x][u.y] = "Ce"
 		end
 	end
-	
+
 	map_string = "border_size=1\nusage=map\n\n"
 	for y = 0, map_dim.y + 1 do
 		for x = 0, map_dim.x do
