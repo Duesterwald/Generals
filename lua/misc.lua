@@ -39,6 +39,7 @@
 			r = r - wi
 			if r < 0 then return i, -r/wi end
 		end
+		return nil, ran
 	end
 
 	function sawtooth(maximum, deviation, direction)

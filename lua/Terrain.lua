@@ -59,6 +59,7 @@
 		O =
 		{
 			pressure = 10,
+			road_windedness = 0.,
 			village_density_factor = 0.2,
 			castle_density = 0,
 			flat_density = 0,
@@ -71,6 +72,7 @@
 			keep = {"Khw"},
 			castle = {"Chw"},
 			flat = {},
+			road = {},
 			hill = {},
 			mountain = {},
 			forest = {"^Ewl", "^Ewf"}
@@ -79,6 +81,7 @@
 		W =
 		{
 			pressure = 10,
+			road_windedness = 0.3,
 			village_density_factor = 0.5,
 			castle_density = 5,
 			flat_density = 10,
@@ -91,6 +94,7 @@
 			keep = {"Khw"},
 			castle = {"Chw"},
 			flat = {"Wwf", "Ds"},
+			road = {"Wwf"},
 			hill = {},
 			mountain = {},
 			forest = {"^Ewl", "^Ewf"}
@@ -99,6 +103,7 @@
 		G =
 		{
 			pressure = 13,
+			road_windedness = 0.2,
 			village_density_factor = 1,
 			castle_density = 10,
 			flat_density = 10,
@@ -110,7 +115,8 @@
 			village = {"^Ve", "^Vh", "^Vhr", "^Vwm", "^Vht", "^Vc", "^Vl" },
 			keep = {"Ke", "Kh", "Kv", "Khr"},
 			castle = {"Ce", "Ch", "Cv", "Chr"},
-			flat = {"Gg", "Gs", "Gd", "Gll", "Ww", "Rr", "Re"},
+			flat = {"Gg", "Gs", "Gd", "Gll", "Ww", "Re"},
+			road = {"Re", "Rr", "Rp"},
 			hill = {"Hh", "Hhd"},
 			mountain = {"Mm", "Md"},
 			forest = {"^Fet", "^Fp", "^Fds", "^Fdf", "^Fms", "^Fmf"}
@@ -119,6 +125,7 @@
 		R =
 		{
 			pressure = 5,
+			road_windedness = 0.1,
 			village_density_factor = 1,
 			castle_density = 10,
 			flat_density = 30,
@@ -130,7 +137,8 @@
 			village = {"^Vh", "^Vhr", "^Vwm", "^Vht", "^Vc", "^Vl" },
 			keep = {"Ke", "Kh", "Khr"},
 			castle = {"Ce", "Ch", "Chr"},
-			flat = {"Gg", "Gs", "Rb", "Re", "Rd", "Rr", "Rp", "Sm", "Gll"},
+			flat = {"Gg", "Gs",  "Sm", "Gll"},
+			road = {"Re", "Rr", "Rp"},
 			hill = {"Hhd"},
 			mountain = {"Md"},
 			forest = {"^Fet", "^Fp", "^Fds", "^Fdf", "^Fms", "^Fmf"}
@@ -139,6 +147,7 @@
 		A =
 		{
 			pressure = 15,
+			road_windedness = 0.3,
 			village_density_factor = 0.7,
 			castle_density = 20,
 			flat_density = 20,
@@ -150,7 +159,8 @@
 			village = {"^Voa", "^Vea", "^Vha", "^Vca", "^Vla", "^Vaa"},
 			keep = {"Kea", "Koa", "Kha"},
 			castle = {"Cea", "Coa", "Cha"},
-			flat = {"Ww", "Gll", "Rr", "Ai", "Aa"},
+			flat = {"Ww", "Gll", "Ai", "Aa"},
+			road = {"Re", "Rr"},
 			hill = {"Ha"},
 			mountain = {"Ms"},
 			forest = {"^Fpa", "^Fda", "^Fma"}
@@ -159,6 +169,7 @@
 		D =
 		{
 			pressure = 15,
+			road_windedness = 0.2,
 			village_density_factor = 0.7,
 			castle_density = 5,
 			flat_density = 10,
@@ -170,7 +181,8 @@
 			village = {"^Vda", "^Vdt"},
 			keep = {"Kd", "Kdr"},
 			castle = {"Cd", "Cdr"},
-			flat = {"Rd", "Rr", "Dd", "Ds"},
+			flat = {"Dd", "Ds"},
+			road = {"Rd"},
 			hill = {"Hd"},
 			mountain = {"Md"},
 			forest = {"^Ftd", "^Do"}
@@ -179,6 +191,7 @@
 		S =
 		{
 			pressure = 14,
+			road_windedness = 0.5,
 			village_density_factor = 0.7,
 			castle_density = 10,
 			flat_density = 5,
@@ -190,7 +203,8 @@
 			village = {"^Vhs"},
 			keep = {"Khs"},
 			castle = {"Chs"},
-			flat = {"Ss", "Sm", "Gll", "Rb", "Rp"},
+			flat = {"Ss", "Sm", "Gll", "Rb"},
+			road = {"Rp"},
 			hill = {"Hh"},
 			mountain = {"Mm"},
 			forest = {"^Ft", "^Ftr"}
@@ -199,6 +213,7 @@
 		H =
 		{
 			pressure = 15,
+			road_windedness = 0.5,
 			village_density_factor = 0.8,
 			castle_density = 10,
 			flat_density = 5,
@@ -210,7 +225,8 @@
 			village = {"^Vo", "^Vhh", "^Vd"},
 			keep = {"Ko"},
 			castle = {"Co"},
-			flat = {"Ww", "Gg", "Gs", "Gll", "Re", "Rp"},
+			flat = {"Ww", "Gg", "Gs", "Gll"},
+			road = {"Re", "Rp"},
 			hill = {"Hh", "Hhd"},
 			mountain = {"Mm", "Md"},
 			forest = {"^Fdw", "^Fmw"}
@@ -219,6 +235,7 @@
 		M =
 		{
 			pressure = 20,
+			road_windedness = 0.6,
 			village_density_factor = 0.6,
 			castle_density = 5,
 			flat_density = 2,
@@ -230,7 +247,8 @@
 			village = {"^Vo", "^Vhh", "^Vd"},
 			keep = {"Ko"},
 			castle = {"Co"},
-			flat = {"Re", "Rr", "Rp"},
+			flat = {"Gg", "Gs", "Ww"},
+			road = {"Re", "Rp"},
 			hill = {"Hh", "Hhd"},
 			mountain = {"Mm", "Md"},
 			forest = {"^Fdw", "^Fmw"}
@@ -239,6 +257,7 @@
 		U =
 		{
 			pressure = 9,
+			road_windedness = 0.5,
 			village_density_factor = 0.6,
 			castle_density = 10,
 			flat_density = 10,
@@ -250,7 +269,8 @@
 			village = {"^Vu", "^Vud"},
 			keep = {"Kud"},
 			castle = {"Cud"},
-			flat = {"Uu", "Uue", "Urb", "Ur", "Uh"},
+			flat = {"Uu", "Uue", "Urb", "Uh"},
+			road = {"Ur"},
 			hill = {},
 			mountain = {},
 			forest = {"^Uf"}
@@ -259,6 +279,7 @@
 		Q =
 		{
 			pressure = 5,
+			road_windedness = 0.,
 			village_density_factor = 0,
 			castle_density = 0,
 			flat_density = 10,
@@ -271,6 +292,7 @@
 			keep = {"Kud"},
 			castle = {"Cud"},
 			flat = {"Uu", "Uue", "Urb", "Ur", "Uh"},
+			road = {},
 			hill = {},
 			mountain = {},
 			forest = {}
@@ -279,6 +301,7 @@
 		X =
 		{
 			pressure = 5,
+			road_windedness = 0.,
 			village_density_factor = 0,
 			castle_density = 0,
 			flat_density = 0,
@@ -291,6 +314,7 @@
 			keep = {"Kud"},
 			castle = {"Cud"},
 			flat = {},
+			road = {},
 			hill = {},
 			mountain = {},
 			forest = {}
@@ -359,7 +383,8 @@
 		end,
 
 		get_overlay = function (self)
-			return self._overlay
+			if self:has_forest() then return self._overlay end
+			return ""
 		end,
 
 		set_overlay = function(self, overlay)
@@ -400,13 +425,34 @@
 			return f.forest[i], r
 		end,
 
-		get_forest_density = function (self)
-			if #self._overlay < 2 or string.sub(self._overlay, 1, 2) ~= "^F" then
-				return self:get_class().forest_density
-			else
-				return self:get_class().forest_density * 50
-			end
-		end
+		has_forest = function (self)
+			if #self._overlay < 2 then return false end
+			return Terrain._forest_definition[self._overlay] or string.sub(self._overlay, 1, 2) == "^F"
+		end,
+	}
+
+	Terrain._forest_definition =
+	{
+		["^Ewl"] = true,
+		["^Ewf"] = true,
+		["^Fet"] = true,
+		["^Fetd"] = true,
+		["^Ft"] = true,
+		["^Ftr"] = true,
+		["^Ftd"] = true,
+		["^Ftp"] = true,
+		["^Fts"] = true,
+		["^Fp"] = true,
+		["^Fpa"] = true,
+		["^Fds"] = true,
+		["^Fdf"] = true,
+		["^Fdw"] = true,
+		["^Fda"] = true,
+		["^Fms"] = true,
+		["^Fmf"] = true,
+		["^Fmw"] = true,
+		["^Fma"] = true,
+		["^Uf"] = true,
 	}
 
 	function Terrain._mt.__tostring(self)
@@ -495,6 +541,85 @@
 		end
 		return map_string
 	end
+
+	function feature(rand_gen, start, length, correlation, terrain)
+		local f = HexVecSet.new()
+		f[start] = terrain
+		local last_dir = 0
+		while #f < length do
+			last_dir = weighted_key(rand_gen(), correlation[last_dir])
+			repeat
+				start = start + adjacent_offset[last_dir]
+			until f[start] == nil
+			f[start] = terrain
+		end
+		return f
+	end
+
+	function road(rand_gen, start, diff, deviations, terrain)
+		if diff.length < deviations then error("road(): deviations must be less than diff.length!") end
+		local res = HexVecSet.new()
+		res[start] = terrain
+		if diff[1] == 0 and diff[2] == 0 then return res end
+
+		-- find out how many steps in which direction must be taken to get from start
+		-- to finish
+		local dirs = { 0, 0, 0, 0, 0, 0}
+		if diff[1]*diff[2] < 0 then
+			if diff[1] > 0 then
+				dirs[2] = math.min(diff[1], -diff[2])
+				if diff[1] > -diff[2] then
+					dirs[3] = diff[1] + diff[2]
+				else
+					dirs[1] = -diff[2] - diff[1]
+				end
+			else
+				dirs[5] = math.min(-diff[1], diff[2])
+				if -diff[1] < diff[2] then
+					dirs[4] = diff[2] + diff[1]
+				else
+					dirs[6] = -diff[1] - diff[2]
+				end
+			end
+		else
+			-- one of them might be zero. Therefore the sum is compared to 0.
+			if diff[1] + diff[2] > 0 then dirs[3], dirs[4] = diff[1], diff[2]
+			else dirs[6], dirs[1] = -diff[1], -diff[2]
+			end
+		end
+
+		local cdir = 1
+		-- add some deviations
+		for cdir = 1, 6 do
+			if dirs[cdir] > 0 then
+				if dirs[left_to(cdir)] ~= 0 then cdir = left_to(cdir) end
+				dirs[left_to(cdir)] = deviations
+				if dirs[right_to(cdir)] == 0 then
+					dirs[cdir] = dirs[cdir] - deviations
+				else
+					cdir = right_to(cdir)
+				end
+				dirs[right_to(cdir)] = deviations
+				break
+			end
+		end
+
+		local corr = correlation(nil, nil, 2)
+		local w = {}
+		
+		local next_dir = weighted_key(rand_gen(), dirs)
+		while next_dir ~= nil do
+			start = start + adjacent_offset[next_dir]
+			res[start] = terrain
+			dirs[next_dir] = dirs[next_dir] - 1
+			for i = 1, 6 do w[i] = corr[next_dir][i] * dirs[i] end
+			next_dir = weighted_key(rand_gen(), w)
+		end
+
+		print("road finished")
+		return res
+	end
+
 
 	print("Terrain.lua loaded.")
 >>
