@@ -51,7 +51,7 @@
 	end
 
 	function HexVec._mt.__tostring(u)
-		return "(" .. u.x .. ", " .. u.y .. ")"
+		return "(" .. u[1] .. ", " .. u[2] .. ")"
 	end
 
 	function HexVec._mt.__index(vec, index)
@@ -79,6 +79,7 @@
 	end
 
 	function HexVecSet._mt.__index(s, u)
+		if HexVecSet._functions[u] ~= nil then return HexVecSet._functions[u] end
 		if type(u) ~= "table" or getmetatable(u) ~= HexVec._mt then
 			error("Error: tried to obtain value of non-HexVec key" .. u)
 			return nil
@@ -86,6 +87,41 @@
 		local entry = rawget(s, HexVecSet._vec2ind(u))
 		if entry == nil then return nil else return entry[2] end
 	end
+
+	HexVecSet._functions =
+	{
+		contains = function (self, pos)
+			return self[pos] ~= nil
+		end,
+
+		overlaps_with = function (self, other)
+			for u in self() do
+				for v in other() do
+					if u == v then return true end
+				end
+			end
+		end,
+
+		touches = function (self, other)
+			for u in self() do
+				for v in other() do
+					if (u - v).length == 1 then return true end
+				end
+			end
+		end,
+
+		border = function (self, value, include_self)
+			local res = HexVecSet.new()
+			for u,d in self() do
+				for i = 1, 6 do
+					local b = u + adjacent_offset[i]
+					if self[b] == nil and res[b] == nil then res[b] = value end
+				end
+				if include_self then res[u] = d end
+			end
+			return res
+		end
+	}
 
 	function HexVecSet._mt.__newindex(s, u, v)
 		if type(u) ~= "table" or getmetatable(u) ~= HexVec._mt then
@@ -109,63 +145,6 @@
 		return l
 	end
 
-	Map = {}
-	Map._mt = {}
-
-	function Map.new(map_dimension)
-		local map = {}
-		for i = 0, map_dimension.x + 1 do
-			map[i] = {}
-		end
-		map._dimension_x = map_dimension.x + 1
-		map._dimension_y = map_dimension.y + 1
-		setmetatable(map, Map._mt)
-		return map
-	end
-
-	function Map._mt.__newindex(m, u, t)
-		if type(u) ~= "table" or getmetatable(u) ~= HexVec._mt then
-			error("Map-Error: tried to set value with non-HexVec key" .. u)
-			return nil
-		end
-		if u.x < 0 or u.x > m.x or u.y < 0 or u.y > m.y then
-			return nil
-		end
-		rawget(m, u.x)[u.y] = t
-	end
-
-	function Map._mt.__index(m, u)
-		if u == "x" then return rawget(m, "_dimension_x")
-		elseif u == "y" then return rawget(m, "_dimension_y")
-		elseif type(u) ~= "table" or getmetatable(u) ~= HexVec._mt then
-			error("Map-Error: tried to get value with non-HexVec key" .. u)
-			return nil
-		end
-		if u.x < 0 or u.x > m.x or u.y < 0 or u.y > m.y then
-			return nil
-		end
-		return rawget(m, u.x)[u.y]
-	end
-
-	function Map._mt.__call(m, x, y, value)
-		if x < 0 or x > m.x or y < 0 or y > m.y then
-			return nil
-		end
-		if value ~= nil then rawget(m, x)[y] = value end
-		return rawget(m, x)[y]
-	end
-
-	function Map._mt.__tostring(m)
-		local map_string = "border_size=1\nusage=map\n\n"
-		for y = 0, m.y do
-			for x = 0, m.x - 1 do
-				map_string = map_string .. m(x, y) .. ','
-			end
-			map_string = map_string .. m(m.x, y) .. '\n'
-		end
-		return map_string
-	end
-
 	adjacent_offset =
 	{
 		HexVec.new({ 0,-1}),
@@ -176,6 +155,15 @@
 		HexVec.new({-1, 0})
 	}
 
+	function left_to(i)
+		if i == 1 then return 6 end
+		return i - 1
+	end
+
+	function right_to(i)
+		if i == 6 then return 1 end
+		return i + 1
+	end
 
 	keep_conn = {}
 	for i = 1,6 do keep_conn[i] = adjacent_offset[i]*(map_size*2) end
@@ -214,8 +202,8 @@
 		end
 
 		local radial = adjacent_offset[sextant] * (max_radius + 1)
-		local tangential = adjacent_offset[ 1 + ((sextant + 2) % 6)] * (i - number_tiles - 1)
-		return radial + tangential
+		local tangential = adjacent_offset[ 1 + ((sextant + 1) % 6)] * (i - number_tiles)
+		return radial + tangential, random_number
 	end
 
 	print("HexVec.lua loaded")
