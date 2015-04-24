@@ -110,6 +110,16 @@
 			end
 		end,
 
+		random_hex = function(self, random_number)
+			random_number = random_number * #self
+			for void, hex in self() do
+				random_number = random_number - 1
+				if random_number < 0 then 
+					return hex[1], -random_number
+				end
+			end
+		end,
+
 		border = function (self, value, include_self)
 			local res = HexVecSet.new()
 			for u,d in self() do

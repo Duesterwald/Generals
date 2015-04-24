@@ -58,10 +58,11 @@
 			corr_matrix[last_dir] = {}
 			local sum = 0
 			for direction = 1, 6 do
-				if ( direction - last_dir + 6 ) % 6 == 3 then corr_matrix[last_dir][direction] = 0
-				else corr_matrix[last_dir][direction] = sawtooth(bias, bias_deviation, direction) *
+				--if ( direction - last_dir + 6 ) % 6 == 3 then corr_matrix[last_dir][direction] = 0
+				--else
+					corr_matrix[last_dir][direction] = sawtooth(bias, bias_deviation, direction) *
 					sawtooth(last_dir, correlation_strength, direction)
-				end
+				--end
 				sum = sum + corr_matrix[last_dir][direction]
 			end
 			corr_matrix[last_dir].sum = sum

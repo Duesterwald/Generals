@@ -560,6 +560,7 @@
 		if diff.length < deviations then error("road(): deviations must be less than diff.length!") end
 		local res = HexVecSet.new()
 		res[start] = terrain
+		local start_backup = start
 		if diff[1] == 0 and diff[2] == 0 then return res end
 
 		-- find out how many steps in which direction must be taken to get from start
@@ -588,7 +589,7 @@
 			end
 		end
 
-		local cdir = 1
+		print(dirs[1], dirs[2], dirs[3], dirs[4], dirs[5], dirs[6])
 		-- add some deviations
 		for cdir = 1, 6 do
 			if dirs[cdir] > 0 then
@@ -603,6 +604,7 @@
 				break
 			end
 		end
+		print(dirs[1], dirs[2], dirs[3], dirs[4], dirs[5], dirs[6])
 
 		local corr = correlation(nil, nil, 2)
 		local w = {}
@@ -612,11 +614,13 @@
 			start = start + adjacent_offset[next_dir]
 			res[start] = terrain
 			dirs[next_dir] = dirs[next_dir] - 1
-			for i = 1, 6 do w[i] = corr[next_dir][i] * dirs[i] end
+			for i = 1, 6 do w[i] = corr[next_dir][i] * math.sqrt(dirs[i]) end
 			next_dir = weighted_key(rand_gen(), w)
+		print(dirs[1], dirs[2], dirs[3], dirs[4], dirs[5], dirs[6])
 		end
 
-		print("road finished")
+		print("road finished, target = ", start - start_backup)
+		if diff ~= start - start_backup then error("Road did not add up!") end
 		return res
 	end
 

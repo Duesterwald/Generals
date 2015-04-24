@@ -48,10 +48,10 @@
 	local map = Map.new(map_dim)
 	for x = 0, map.x do
 		for y = 0, map.y do
-			local min_dis = 4 * map_size
+			local min_dis = 1e99 * map_size
 			for u, terrain in surrounding_terrain() do
 				local pos = HexVec.new(x, y)
-				local dis = ( pos - u ).length
+				local dis = ( pos - u ).length / terrain:get_class().pressure
 				if dis <= min_dis then
 					map:set_code(pos, terrain:get_base()..terrain:get_overlay())
 					min_dis = dis
@@ -85,6 +85,13 @@
 			for mpos,mt in f() do map:set_code(mpos, mt) end
 		end
 
+	end
+
+	for u, terrain in surrounding_terrain() do
+		local v = local2global[u]
+		local rv = function () return ran(v) end
+		local tclass = terrain:get_class()
+
 		for void = 1, math.ceil(ran(v) * hex_area * tclass.flat_density / 500) do
 			local r,tind,start,f = ran(v), nil
 			tind = ran_element(r, tclass.flat)
@@ -97,6 +104,13 @@
 			local f = feature(rv, start, length, corr, tind)
 			for fpos, ft in f() do map:set_code(fpos, ft) end
 		end
+
+	end
+
+	for u, terrain in surrounding_terrain() do
+		local v = local2global[u]
+		local rv = function () return ran(v) end
+		local tclass = terrain:get_class()
 
 		for void = 1, math.ceil(ran(v) * hex_area * tclass.forest_density / 500) do
 			local r,tind,start,f = ran(v), nil
@@ -112,6 +126,13 @@
 				map:set_overlay(fpos, ft)
 			end
 		end
+
+	end
+
+	for u, terrain in surrounding_terrain() do
+		local v = local2global[u]
+		local rv = function () return ran(v) end
+		local tclass = terrain:get_class()
 
 		local kt,ct = terrain:get_keep_and_castle(ran(v))
 		local keep_set = feature(rv, u, keep_size + 1, correlation(nil, nil, -2), ct)
@@ -131,7 +152,7 @@
 				local target = rvec[1] * map_size + rvec[2] * math.floor(map_size / 3)
 				if map_size % 3 == 2 then target = target + rvec[3] end
 				print("target "..void.." = "..tostring(target))
-				local rd = road(rv, u, target, tclass.road_windedness * map_size,rterrain)
+				local rd = road(rv, u, target, round(tclass.road_windedness * map_size),rterrain)
 				for rpos, rt in rd() do
 					map:set_code(rpos, rt)
 					village_block[rpos] = rt
