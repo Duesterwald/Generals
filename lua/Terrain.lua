@@ -119,7 +119,7 @@
 			road = {"Re", "Rr", "Rp"},
 			hill = {"Hh", "Hhd"},
 			mountain = {"Mm", "Md"},
-			forest = {"^Fet", "^Fp", "^Fds", "^Fdf", "^Fms", "^Fmf"}
+			forest = {"^Fp", "^Fds", "^Fdf", "^Fms", "^Fmf"}
 		},
 		-- Dirt
 		R =
@@ -141,7 +141,7 @@
 			road = {"Re", "Rr", "Rp"},
 			hill = {"Hhd"},
 			mountain = {"Md"},
-			forest = {"^Fet", "^Fp", "^Fds", "^Fdf", "^Fms", "^Fmf"}
+			forest = {"^Fp", "^Fdf", "^Fms", "^Fmf"}
 		},
 		-- Frozen
 		A =
@@ -400,6 +400,7 @@
 		end,
 
 		get_village = function (self,r)
+			if self:is_town() then return self._overlay end
 			local v = self:get_class()
 			local i = nil
 			i,r = ran_int(r, #v.village)
@@ -429,10 +430,16 @@
 			if #self._overlay < 2 then return false end
 			return Terrain._forest_definition[self._overlay] or string.sub(self._overlay, 1, 2) == "^F"
 		end,
+
+		is_town = function (self)
+			if #self._overlay < 2 then return false end
+			return string.sub(self._overlay, 1, 2) == "^V"
+		end
 	}
 
 	Terrain._forest_definition =
 	{
+		["^Do"] = true,
 		["^Ewl"] = true,
 		["^Ewf"] = true,
 		["^Fet"] = true,
@@ -467,7 +474,7 @@
 		for i = 0, map_dimension.x + 1 do
 			map[i] = {}
 			for j = 0, map_dimension.y + 1 do
-				map[i][j] = Terrain.new("Gg")
+				map[i][j] = Terrain.new("Xv")
 			end
 		end
 		map._dimension_x = map_dimension.x + 1
@@ -589,7 +596,6 @@
 			end
 		end
 
-		print(dirs[1], dirs[2], dirs[3], dirs[4], dirs[5], dirs[6])
 		-- add some deviations
 		for cdir = 1, 6 do
 			if dirs[cdir] > 0 then
@@ -604,7 +610,6 @@
 				break
 			end
 		end
-		print(dirs[1], dirs[2], dirs[3], dirs[4], dirs[5], dirs[6])
 
 		local corr = correlation(nil, nil, 2)
 		local w = {}
@@ -616,10 +621,8 @@
 			dirs[next_dir] = dirs[next_dir] - 1
 			for i = 1, 6 do w[i] = corr[next_dir][i] * math.sqrt(dirs[i]) end
 			next_dir = weighted_key(rand_gen(), w)
-		print(dirs[1], dirs[2], dirs[3], dirs[4], dirs[5], dirs[6])
 		end
 
-		print("road finished, target = ", start - start_backup)
 		if diff ~= start - start_backup then error("Road did not add up!") end
 		return res
 	end

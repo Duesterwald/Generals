@@ -2,7 +2,6 @@
 	HexVec = {}
 	HexVec._mt = {}
 
-
 	function HexVec.new(x,y)
 		local vec = {}
 		if type(x) == "table" then
@@ -68,8 +67,11 @@
 	HexVecSet = {}
 	HexVecSet._mt = {}
 
+	HexVecSet._index_meta = {}
+
 	function HexVecSet.new()
-		local s = {}
+		local s = { _length = 0, _index_table = {} }
+		setmetatable(s._index_table, HexVecSet._index_meta)
 		setmetatable(s, HexVecSet._mt)
 		return s
 	end
@@ -110,14 +112,50 @@
 			end
 		end,
 
-		random_hex = function(self, random_number)
-			random_number = random_number * #self
-			for void, hex in self() do
-				random_number = random_number - 1
-				if random_number < 0 then 
-					return hex[1], -random_number
+		add = function (self, other)
+			for u, val in other() do
+				self[u] = val
+			end
+		end,
+
+		subtract = function (self, other)
+			local tmp = self()()
+			for u in other() do
+				self[u] = nil
+			end
+			if tmp ~= nil and self()() == nil and #self > 0 then error("subtract broke sth") end
+		end,
+
+		insert = function (self, other, func)
+			for u, data in other() do
+				if self[u] ~= nil then
+					if func == nil then
+						self[u] = data
+					else
+						self[u] = func(self[u], data)
+					end
 				end
 			end
+		end,
+
+		xor_with = function (self, other)
+			for u in (self * other)() do
+				self[u] = nil
+				other[u] = nil
+			end
+		end,
+
+		get_by_index = function (self, index)
+			local vecind = rawget(self, "_index_table")[index]
+			local data = rawget(self, vecind)
+			if data == nil then return nil end
+			return data[1], data[2]
+		end,
+
+		random_hex = function(self, random_number)
+			local i, r = ran_int(random_number, #self)
+			local u, t = self:get_by_index(i)
+			return u, r
 		end,
 
 		border = function (self, value, include_self)
@@ -135,25 +173,84 @@
 
 	function HexVecSet._mt.__newindex(s, u, v)
 		if type(u) ~= "table" or getmetatable(u) ~= HexVec._mt then
-			error("Error: tried to set value with non-HexVec key" .. u)
+			error("Error: tried to set value with non-HexVec key", u)
 			return nil
 		end
-		rawset(s, HexVecSet._vec2ind(u), {u, v})
+		local prev = s[u]
+		local ind = HexVecSet._vec2ind(u)
+		if v == nil and prev ~= nil then
+			local it = rawget(s,"_index_table")
+			rawset(s, ind, nil)
+			rawset(s, "_length", #s - 1)
+			rawget(s, "_index_table"):delete(ind)
+			it = rawget(s,"_index_table")
+		elseif v ~= nil then
+			if prev == nil then
+				rawset(s, "_length", #s + 1)
+				rawget(s, "_index_table"):add(ind)
+			end
+			rawset(s, ind, {u, v})
+		end
 	end
 
 	function HexVecSet._mt.__call(s)
-		local val, current_index = nil
+		local i = 0
 		return function()
-			current_index, val = next(s, current_index)
-			if val == nil then return nil else return val[1], val[2] end
+			i = i + 1
+			return s:get_by_index(i)
 		end
 	end
 
-	function HexVecSet._mt.__len(s)
-		local l = 0
-		for i in s() do l = l + 1 end
-		return l
+	-- Addition is union
+	function HexVecSet._mt.__add(l, r)
+		local res = HexVecSet.new()
+		for u in l() do res[u] = true end
+		for u in r() do res[u] = true end
+		return res
 	end
+
+	-- Multiplication is intersection
+	function HexVecSet._mt.__mul(l, r)
+		local res = HexVecSet.new()
+		for u in l() do
+			if r[u] ~= nil then res[u] = true end
+		end
+		return res
+	end
+
+	function HexVecSet._mt.__len(s)
+		return rawget(s, "_length")
+	end
+
+	function HexVecSet._index_meta.__index(it, func)
+		return HexVecSet._index_table_functions[func]
+	end
+
+	HexVecSet._index_table_functions =
+	{
+		find = function(self, number)
+			if #self == 0 or number < self[1] then return 1 end
+			if number > self[#self] then return #self + 1 end
+			local upper, middle, lower = #self, 1, 1
+			while upper ~= lower and upper ~= lower + 1 do
+				middle = math.floor((upper + lower) / 2)
+				if number > self[middle] then lower = middle
+				elseif number < self[middle] then upper = middle
+				else return middle
+				end
+			end
+			if number == self[lower] then return lower end
+			return upper
+		end,
+
+		add = function(self, number)
+			table.insert(self, self:find(number), number)
+		end,
+
+		delete = function(self, number)
+			table.remove(self, self:find(number))
+		end
+	}
 
 	adjacent_offset =
 	{
@@ -175,15 +272,86 @@
 		return i + 1
 	end
 
+	HexVecSet._super_hex_storage = { r = 0, n = HexVecSet.new(), [0] = HexVecSet.new() }
+	HexVecSet._super_hex_storage[0][HexVec.new({0,0})] = true
+	for i = 1, 6 do
+		HexVecSet._super_hex_storage.n[adjacent_offset[i]] = {i}
+	end
+
+	function HexVecSet._grow_super_hex_storage()
+		local function ad(set, pos, dir)
+			pos = pos + adjacent_offset[dir]
+			if set[pos] == nil then set[pos] = {} end
+			set[pos][#set[pos] + 1] = dir
+		end
+		local function are_close(dirs)
+			return left_to(dirs[1]) == dirs[2] or right_to(dirs[1]) == dirs[2]
+		end
+
+		local r = HexVecSet._super_hex_storage.r
+		local n = HexVecSet._super_hex_storage.n
+		local m = HexVecSet.new()
+		local h = HexVecSet.new()
+		for npos, ndir in n() do
+			n[npos] = true
+			if #ndir == 1 then
+				ad(m, npos, left_to(ndir[1]))
+				ad(m, npos, ndir[1])
+				ad(m, npos, right_to(ndir[1]))
+			elseif #ndir == 2 and are_close(ndir) then
+				for void, dir in pairs(ndir) do
+					ad(m, npos, dir)
+					local hp = npos + adjacent_offset[dir]
+					if h[hp] ~= nil then
+						m[hp] = nil
+						local left, right = h[hp], dir
+						if dir == left_to(h[hp]) then left, right = dir, h[hp] end
+						ad(m, hp, left_to(left))
+						ad(m, hp, left)
+						ad(m, hp, right)
+						ad(m, hp, right_to(right))
+						h[hp] = true
+					else
+						h[hp] = dir
+					end
+				end
+			end
+		end
+		for hpos, hbool in h() do if hbool == true then n[hpos] = true end end
+		HexVecSet._super_hex_storage.r, r = r + 1, r + 1
+		HexVecSet._super_hex_storage[r] = n
+		HexVecSet._super_hex_storage.n = m
+	end
+
+	function HexVecSet.super_hex(center, radius, value)
+		while HexVecSet._super_hex_storage.r < radius do
+			HexVecSet._grow_super_hex_storage()
+		end
+
+		local s = HexVecSet.new()
+		for i = 0, radius do
+			for pos in HexVecSet._super_hex_storage[i]() do
+				s[center + pos] = value
+			end
+		end
+		return s
+	end
+
 	keep_conn = {}
 	for i = 1,6 do keep_conn[i] = adjacent_offset[i]*(map_size*2) end
 
 	function dir(u)
-		local l = u.length
-		for d = 1, 6 do
-			if adjacent_offset[d]*l == u then return d end
+		if u[1] * u[2] < 0 then
+			local ret = 1 - u[1]/u[2]
+			if math.abs(u[1]) > math.abs(-u[2]) then ret = 3 + u[2]/u[1] end
+			if u[1] < 0 then ret = ret + 3 end
+			return ret
 		end
-		return nil
+		local ret = u[2] / (u[1] + u[2])
+		if u[1] > 0 or u[2] > 0 then ret = ret + 3
+		elseif u[1] < u[2] then ret = ret + 6
+		end
+		return ret
 	end
 
 	--! Returns an iterator over adjacent locations that can be used in a for-in loop.
