@@ -168,6 +168,13 @@
 				if include_self then res[u] = d end
 			end
 			return res
+		end,
+
+		thin = function(self, rand_gen, fraction)
+			local size = #self
+			for void = 1, fraction * size do
+				self[self:random_hex(rand_gen())] = nil
+			end
 		end
 	}
 

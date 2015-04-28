@@ -51,7 +51,7 @@
 
 	local super_hexes = HexVecSet.new()
 	for u, terrain in surrounding_terrain() do
-		super_hexes[u] = HexVecSet.super_hex(u, map_size, terrain)
+		super_hexes[u] = HexVecSet.super_hex(u, map_size, Terrain.new(terrain:get_base()))
 	end
 
 	local processed_edge = HexVecSet.new()
@@ -79,7 +79,7 @@
 				local length = map_size * map_size / (up + ap) / 5
 				-- For each overlapping tile, create a feature
 				for x in (us * as)() do
-					local strong, weak = {u,t,up * length}, {au,at,ap * length}
+					local strong, weak = {u,Terrain.new(t:get_base()),up * length}, {au,Terrain.new(at:get_base()),ap * length}
 					if edge_ran() > thresh  then strong, weak = weak, strong end
 
 					feats[#feats+1] = { strong[1], weak[1], feature(edge_ran, x, strong[3], correlation(dir(weak[1] - x), 4, -3), strong[2]) }
@@ -98,6 +98,11 @@
 		local v = local2global[u]
 		local rv = function () return ran(v) end
 		local tclass = terrain:get_class()
+
+		local ofeats = surrounding_terrain[u]:get_overlay_features(rv, u)
+		for void, feat in ipairs(ofeats.full) do super_hexes[u]:insert(feat) end
+		for void, feat in ipairs(ofeats.base) do super_hexes[u]:insert(feat, function(t,n) t:set_base(n) return t end) end
+		for void, feat in ipairs(ofeats.overlay) do super_hexes[u]:insert(feat, function(t,n) return Terrain.new(t:get_base()..n) end) end
 
 		-- Create some mountains
 		for void = 1, math.ceil(ran(v) * #super_hexes[u] * tclass.mountain_density / 500) do
@@ -119,13 +124,8 @@
 			end
 			super_hexes[u]:insert(f)
 		end
-	end
 
-	for u, terrain in surrounding_terrain() do
-		local v = local2global[u]
-		local rv = function () return ran(v) end
-		local tclass = terrain:get_class()
-
+		-- create some flat patches
 		for void = 1, math.ceil(ran(v) * #super_hexes[u] * tclass.flat_density / 500) do
 			local r,tind,start,f = ran(v), nil
 			tind,r = ran_element(r, tclass.flat)
@@ -138,13 +138,8 @@
 			local f = feature(rv, start, length, corr, tind)
 			super_hexes[u]:insert(f)
 		end
-	end
 
-	for u, terrain in surrounding_terrain() do
-		local v = local2global[u]
-		local rv = function () return ran(v) end
-		local tclass = terrain:get_class()
-
+		-- create some forests
 		for void = 1, math.ceil(ran(v) * #super_hexes[u] * tclass.forest_density / 500) do
 			local r,tind,start,f = ran(v), nil
 			tind,r = ran_element(r, tclass.forest)
@@ -160,7 +155,7 @@
 
 	for void, super_hex in super_hexes() do
 		for u, terrain in super_hex() do
-			map:set_code(u, terrain:get_base()..terrain:get_overlay())
+			map:set_code(u, terrain:get_code())
 		end
 	end
 
@@ -173,6 +168,10 @@
 		local keep_set = feature(rv, u, keep_size + 1, correlation(nil, nil, -2), ct)
 		keep_set[u] = kt
 		local village_block = keep_set:border('Ww', true)
+
+		for kb in keep_set:border(0)() do
+			if map:contains(kb) then map:set_base(kb, map[kb]:get_base()) end
+		end
 
 		-- Build the roads
 		if #tclass.road > 0 then
@@ -202,21 +201,12 @@
 		end
 
 		local villages = HexVecSet.new()
-		if terrain:is_town() then
-			for pos, postrn in super_hexes[u]() do
-				if ran(v) * map_size  * tclass.village_density_factor > (pos - u).length and
-					not village_block:contains(pos) and postrn:get_class() == tclass then
-					villages[pos] = terrain:get_village()
-				end
-			end
-		else
-			while #villages < math.ceil(num_villages * tclass.village_density_factor) do
-				local pos = u + random_position(ran(v), map_size)
-				if not village_block:contains(pos) then
-					local vill = ""
-					if map:contains(pos) then vill = map[pos]:get_village(ran(v)) end
-					villages[pos] = vill
-				end
+		while #villages < math.ceil(num_villages * tclass.village_density_factor) do
+			local pos = u + random_position(ran(v), map_size)
+			if not village_block:contains(pos) then
+				local vill = ""
+				if map:contains(pos) then vill = map[pos]:get_village(ran(v)) end
+				villages[pos] = vill
 			end
 		end
 		for vil_pos, vil_ov in villages() do map:set_overlay(vil_pos, vil_ov) end

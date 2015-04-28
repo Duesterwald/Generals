@@ -383,8 +383,7 @@
 		end,
 
 		get_overlay = function (self)
-			if self:has_forest() then return self._overlay end
-			return ""
+			return self._overlay
 		end,
 
 		set_overlay = function(self, overlay)
@@ -417,6 +416,37 @@
 			v = self:get_class()
 			i,r = ran_int(r, #v.keep)
 			return v.keep[i], v.castle[i], r
+		end,
+
+		get_overlay_features = function(self, rand_gen, start)
+			local ov = self._overlay
+			if ov == nil or #ov < 2 then return { overlay={}, base={}, full={}} end
+
+			local sub = string.sub(ov, 1, 2)
+
+			if  sub == "^F" then return
+			{
+				overlay={feature(rand_gen, start, map_size * map_size / 2, correlation(nil, nil, -3), ov)},
+				base={},
+				full={}
+			}
+
+			elseif sub == "^V" then
+				local village = HexVecSet.super_hex(start, 1 + map_size/4, ov)
+				local keep, castle = self:get_keep_and_castle(rand_gen())
+				local wall = village:border(Terrain.new(castle))
+				village:thin(rand_gen, 0.3)
+				wall:thin(rand_gen, 0.2)
+				return { overlay={village}, base={}, full={wall} }
+
+			elseif ov == "^Do" then
+				local oasis = feature(rand_gen, start, 2 + map_size * map_size / 16, correlation(ran_element(rand_gen(), {0.5, 2.5, 4.5}), 3, -4),Terrain.new("Wot"))
+				oasis = oasis:border(Terrain.new("Wwt"), true)
+				oasis = oasis:border(Terrain.new("Ds^Ftd"), true)
+				return { overlay={}, base={}, full={oasis, shore} }
+
+			end
+			return { overlay={}, base={}, full={}}
 		end,
 
 		get_forest = function (self, r)
