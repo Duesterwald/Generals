@@ -131,9 +131,7 @@
 			tind,r = ran_element(r, tclass.flat)
 			tind = Terrain.new(tind)
 			start,r = super_hexes[u]:random_hex(r)
-			local bdc = {}
-			for i = 1,3 do bdc[i],r = ran_int(r, 6) end
-			local corr = correlation(bdc[1], bdc[2], bdc[3])
+			local corr = correlation(ran(v)*6, 2 + ran(v) * 4, ran(v)*12 - 6)
 			local length = math.ceil(r * tclass.flat_size * map_size)
 			local f = feature(rv, start, length, corr, tind)
 			super_hexes[u]:insert(f)

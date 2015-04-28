@@ -113,8 +113,8 @@
 			forest_density = 10,
 			forest_size = 1.,
 			village = {"^Ve", "^Vh", "^Vhr", "^Vwm", "^Vht", "^Vc", "^Vl" },
-			keep = {"Ke", "Kh", "Kv", "Khr"},
-			castle = {"Ce", "Ch", "Cv", "Chr"},
+			keep = {"Ke", "Kh", "Khr"},
+			castle = {"Ce", "Ch", "Chr"},
 			flat = {"Gg", "Gs", "Gd", "Gll", "Ww", "Re"},
 			road = {"Re", "Rr", "Rp"},
 			hill = {"Hh", "Hhd"},
@@ -399,14 +399,12 @@
 		end,
 
 		get_village = function (self,r)
-			if self:is_town() then return self._overlay end
 			local v = self:get_class()
-			local i = nil
-			i,r = ran_int(r, #v.village)
-			return v.village[i], r
+			return ran_element(r, v.village)
 		end,
 
 		get_keep_and_castle = function (self,r)
+			if Terrain._elven_forest[self._overlay] then return "Kv", "Cv" end
 			key = string.sub(self._base, 1, 1)
 			if key == "K" or key == "C" then
 				if self._base == "Ket" then return "Ket", "Ce", r
@@ -418,6 +416,13 @@
 			return v.keep[i], v.castle[i], r
 		end,
 
+		get_forest = function (self, r)
+			local f = self:get_class()
+			local i = nil
+			i,r = ran_int(r, #f.forest)
+			return f.forest[i], r
+		end,
+
 		get_overlay_features = function(self, rand_gen, start)
 			local ov = self._overlay
 			if ov == nil or #ov < 2 then return { overlay={}, base={}, full={}} end
@@ -426,7 +431,7 @@
 
 			if  sub == "^F" then return
 			{
-				overlay={feature(rand_gen, start, map_size * map_size / 2, correlation(nil, nil, -3), ov)},
+				overlay={HexVecSet.super_hex(start, 2*map_size, ov)},--feature(rand_gen, start, map_size * map_size / 2, correlation(nil, nil, -3), ov)},
 				base={},
 				full={}
 			}
@@ -447,49 +452,19 @@
 
 			end
 			return { overlay={}, base={}, full={}}
-		end,
-
-		get_forest = function (self, r)
-			local f = self:get_class()
-			local i = nil
-			i,r = ran_int(r, #f.forest)
-			return f.forest[i], r
-		end,
-
-		has_forest = function (self)
-			if #self._overlay < 2 then return false end
-			return Terrain._forest_definition[self._overlay] or string.sub(self._overlay, 1, 2) == "^F"
-		end,
-
-		is_town = function (self)
-			if #self._overlay < 2 then return false end
-			return string.sub(self._overlay, 1, 2) == "^V"
 		end
 	}
 
-	Terrain._forest_definition =
+	Terrain._elven_forest =
 	{
-		["^Do"] = true,
-		["^Ewl"] = true,
-		["^Ewf"] = true,
 		["^Fet"] = true,
-		["^Fetd"] = true,
-		["^Ft"] = true,
-		["^Ftr"] = true,
-		["^Ftd"] = true,
-		["^Ftp"] = true,
-		["^Fts"] = true,
 		["^Fp"] = true,
-		["^Fpa"] = true,
 		["^Fds"] = true,
 		["^Fdf"] = true,
 		["^Fdw"] = true,
-		["^Fda"] = true,
 		["^Fms"] = true,
 		["^Fmf"] = true,
-		["^Fmw"] = true,
-		["^Fma"] = true,
-		["^Uf"] = true,
+		["^Fmw"] = true
 	}
 
 	function Terrain._mt.__tostring(self)

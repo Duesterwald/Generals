@@ -21,7 +21,7 @@
 	function ran_int(ran, n)
 		ran = ran * n
 		n = math.ceil(ran)
-		if n-ran == 0 then error("Random bits depleted") end
+		if n-ran == 0 then print("ran_int: Random bits depleted") end
 		return n, n - ran
 	end
 
