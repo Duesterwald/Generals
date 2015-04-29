@@ -1,5 +1,6 @@
 <<
 
+
 	map_size = wesnoth.get_variable("GN_LOCAL_MAP_SIZE")
 
 	global_map_size = {wesnoth.get_map_size()}
