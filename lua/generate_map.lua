@@ -5,15 +5,15 @@
 
 	local atkdir = location[2] - location[1]
 
-	local keep_offset, map_center, map_dim = nil
+	local map_center, map_dim = nil
 	local dy = round(2 + map_size/3)
 
 	if atkdir[1] == 0 then
-		keep_offset = HexVec.new(round(1 + 4/3*map_size), dy)
+		local keep_offset = HexVec.new(round(1 + 4/3*map_size), dy)
 		map_center = (adjacent_offset[4] * map_size) + keep_offset
 		map_dim = HexVec.new(2*keep_offset.x - 1, 2*map_center.y -1)
 	else
-		keep_offset = HexVec.new( round(dy/0.866), dy)
+		local keep_offset = HexVec.new( round(dy/0.866), dy)
 		map_center = (adjacent_offset[3] * map_size) + keep_offset
 		map_dim = HexVec.new(map_center.x*2-1, dy*2-1 + map_size)
 	end
@@ -27,12 +27,13 @@
 			seed_store[v] = seed * (v[1] * 7369 + v[2])
 		end
 		seed_store[v] = (seed_store[v] * 1103515245 + 12345) % 2147483648
-		return seed_store[v]/2147483648
+		return (seed_store[v]%1073741824)/1073741824
 	end
 
 	local keep = { map_center - atkdir * map_size, map_center + atkdir * map_size }
 
 	local surrounding_terrain = HexVecSet.new()
+	local super_hexes = HexVecSet.new()
 	local local2global = HexVecSet.new()
 	local global2local = HexVecSet.new()
 	for i = 1,2 do
@@ -44,54 +45,55 @@
 			local tstring = wesnoth.get_terrain(v.x, v.y)
 			if tstring == nil then tstring = "Xv" end
 			surrounding_terrain[u] = Terrain.new(tstring)
+			super_hexes[u] = HexVecSet.super_hex(u, map_size, Terrain.new(surrounding_terrain[u]:get_base()))
 		end
 	end
 
 	local map = Map.new(map_dim)
 
-	local super_hexes = HexVecSet.new()
-	for u, terrain in surrounding_terrain() do
-		super_hexes[u] = HexVecSet.super_hex(u, map_size, Terrain.new(terrain:get_base()))
-	end
-
 	local processed_edge = HexVecSet.new()
 	local feats = {}
-	for u, t in surrounding_terrain() do
-		local up = t:get_class().pressure
-		local v = local2global[u]
-		local us = super_hexes[u]
-		for i = 1, 6 do
-			local au, av = u + keep_conn[i], v + adjacent_offset[i]
-			if not processed_edge[av + v] then
-				local function edge_ran() return ran((av + v)/2) end
+	for uu, ut in surrounding_terrain() do
+		local u = { uu }
+		local p = { ut:get_class().pressure }
+		local v = { local2global[uu] }
+		local s = { super_hexes[uu] }
+		local t = { Terrain.new(ut:get_base()) }
+		for k = 1, 6 do
+			u[2], v[2] = u[1] + keep_conn[k], v[1] + adjacent_offset[k]
+			if not processed_edge[v[1] + v[2]] then
+				local function edge_ran() return ran((v[1] + v[2])/2) end
 
-				local at, as = surrounding_terrain[au], super_hexes[au]
+				t[2], s[2] = surrounding_terrain[u[2]], super_hexes[u[2]]
 				-- If adjacent tile is not included in the map, create it temporarily
-				if at == nil then
-					at = wesnoth.get_terrain(av.x, av.y)
-					if at == nil then at = "Xv" end
-					at = Terrain.new(at)
-					as = HexVecSet.super_hex(au, map_size, at)
+				if t[2] == nil then
+					t[2] = wesnoth.get_terrain(v[2].x, v[2].y)
+					if t[2] == nil then t[2] = "Xv" end
+					t[2] = Terrain.new(t[2])
+					s[2] = HexVecSet.super_hex(u[2], map_size, t[2])
 				end
-
-				local ap = at:get_class().pressure
-				local thresh = up / (up + ap)
-				local length = map_size * map_size / (up + ap) / 5
+				p[2] = t[2]:get_class().pressure
+				local length = map_size * map_size / (p[1] + p[2]) / 5
+				local strong, weak = 1, 2
+				if p[strong] < p[weak] then strong, weak = 2, 1 end
+				local thresh = p[strong] / (p[weak] + p[strong])
 				-- For each overlapping tile, create a feature
-				for x in (us * as)() do
-					local strong, weak = {u,Terrain.new(t:get_base()),up * length}, {au,Terrain.new(at:get_base()),ap * length}
-					if edge_ran() > thresh  then strong, weak = weak, strong end
-
-					feats[#feats+1] = { strong[1], weak[1], feature(edge_ran, x, strong[3], correlation(dir(weak[1] - x), 4, -3), strong[2]) }
+				for x in (s[1] * s[2])() do
+					local i,j = strong, weak
+					if edge_ran() > thresh then i,j = weak,strong end
+					feats[#feats+1] = { u[i], u[j], feature(edge_ran, x, p[i]*length, correlation(dir(u[j] - x), 4, -3), t[1]) }
 				end
-				processed_edge[av + v] = true
+				processed_edge[v[1] + v[2]] = true
 			end
 		end
 	end
 
+	-- Add and subtract separately for stability
+	for void, feat in pairs(feats) do
+		if super_hexes[feat[2]] ~= nil then super_hexes[feat[2]]:subtract(feat[3]) end
+	end
 	for void, feat in pairs(feats) do
 		if super_hexes[feat[1]] ~= nil then super_hexes[feat[1]]:add(feat[3]) end
-		if super_hexes[feat[2]] ~= nil then super_hexes[feat[2]]:subtract(feat[3]) end
 	end
 
 	for u, terrain in surrounding_terrain() do
