@@ -90,10 +90,11 @@
 				T.list_definition { unit_descriptor }
 			} } },
 
-			T.row { T.column { T.spacer { id = "fin_spacer", height = 10 } } },
+			T.row { T.column { T.spacer { id = "fin_spacer", height = 30 } } },
 
-			T.row { T.column { T.grid { T.row
+			T.row { horizontal_grow = true, T.column { horizontal_grow = true, T.grid { T.row
 			{
+				horizontal_grow = true,
 				T.column { T.button { id = "profile", label = _"Profile" } },
 				T.column { horizontal_grow = true, grow_factor = 1, T.spacer { id = "left_button_spacer" } },
 				T.column { T.button { id = "ok", label = _"OK", return_value = -1 } },
