@@ -1,5 +1,6 @@
 <<
 	_ = wesnoth.textdomain("wesnoth")
+	_G = wesnoth.textdomain("generals")
 	T = {}
 	setmetatable(T, { __index = function (self, key) return function(val) return { key, val } end end })
 
@@ -22,15 +23,15 @@
 	end
 
 	function column(data)
-		data.border = "all"
-		data.border_size = 5
-		data.horizontal_alignment = "left"
-		data.horizontal_grow = true
+		if data.border == nil then data.border = "all" end
+		if data.border_size == nil then data.border_size = 5 end
+		if data.horizontal_alignment == nil then data.horizontal_alignment = "left" end
+		if data.horizontal_grow == nil then data.horizontal_grow = true end
 		return T.column(data)
 	end
 
 	function row(data)
-		data.horizontal_grow = true
+		if data.horizontal_grow == nil then data.horizontal_grow = true end
 		return T.row(data)
 	end
 

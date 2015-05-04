@@ -4,7 +4,7 @@
 		T.toggle_panel
 		{
 			id = "company_info_header",
-			T.grid { T.row {
+			T.grid { row {
 				column { T.spacer { linked_group = "img", id = "header_icon" } },
 				column { T.label  { linked_group = "nam", id = "header_name",   label = _"Name"} },
 				column { T.label  { linked_group = "cst", id = "header_cost",   label = _"Cost"} },
@@ -19,7 +19,7 @@
 		T.toggle_panel
 		{
 			id = "company_info_descriptor",
-			T.grid { T.row {
+			T.grid { row {
 				column { T.image { linked_group = "img", id = "icon"   } },
 				column { T.label { linked_group = "nam", id = "name"   } },
 				column { T.label { linked_group = "cst", id = "cost"   } },
@@ -53,7 +53,7 @@
 
 		T.grid
 		{
-			T.row { T.column { T.label { definition = "title", id = "cmp_title", label = _"Available Companies" } } },
+			row { T.column { T.label { definition = "title", label = _G"Available Companies" } } },
 
 			row { column { T.listbox
 			{
@@ -65,9 +65,9 @@
 			row { column { T.grid { row
 			{
 				T.column { T.button { id = "profile", label = _"Profile" } },
-				T.column { horizontal_grow = true, grow_factor = 1, T.spacer { id = "left_button_spacer" } },
+				T.column { horizontal_grow = true, grow_factor = 1, T.spacer {} },
 				T.column { T.button { id = "ok", label = _"OK", return_value = -1 } },
-				T.column { horizontal_grow = true, grow_factor = 1, T.spacer { id = "right_button_spacer" } },
+				T.column { horizontal_grow = true, grow_factor = 1, T.spacer {} },
 				T.column { T.button { id = "cancel", label = _"Cancel", return_value = -2 } }
 			} } } }
 		}
@@ -78,8 +78,8 @@
 		T.tooltip { id = "tooltip_large" },
 		T.helptip { id = "tooltip_large" },
 
-		T.grid { T.row { T.column { T.label { id = "tlg",
-			label = _"Not enough gold left for recruiting a company!"
+		T.grid { T.row { T.column { T.label {
+			label = _G"Not enough gold left for recruiting a company!"
 		} } } }
 	}
 
@@ -95,7 +95,7 @@
 		wesnoth.wml_actions.open_help({topic = "unit_" .. company_types[company_id[wesnoth.get_dialog_value("companies")]].id})
 	end
 
-	function choose_company_type(gold_left)
+	function choose_company_type(gold_left, variable)
 		company_id = {}
 		for i, company_type in ipairs(company_types) do
 			if gold_left >= company_type.cost then table.insert(company_id, i) end
@@ -123,7 +123,7 @@
 
 		local result = ""
 		if li ~= 0 then result = company_types[company_id[li]].id end
-		wesnoth.set_variable("gn_chosen_company", result)
+		wesnoth.set_variable(variable, result)
 	end
 
 	print("dialog_recruit_company.lua loaded")
