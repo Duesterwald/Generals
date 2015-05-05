@@ -44,17 +44,17 @@
 
 		T.grid
 		{
-			T.row { T.column { T.label { definition = "title", id = "cpt_title", label = _"Captain" } } },
-			T.row { T.column { horizontal_grow = true, T.listbox
+			row { T.column { T.label { definition = "title", id = "cpt_title", label = _"Captain" } } },
+			row { T.column { horizontal_grow = true, T.listbox
 			{
 				id = "captain",
 				T.header { unit_descriptor_header },
 				T.list_definition { unit_descriptor }
 			} } },
 
-			T.row { T.column { T.spacer { id = "mid_spacer", height = 20 } } },
+			row { T.column { T.spacer { id = "mid_spacer", height = 20 } } },
 
-			T.row { T.column { T.label { definition = "title", id = "units_title", label = _"Units" } } },
+			row { T.column { T.label { definition = "title", id = "units_title", label = _"Units" } } },
 			row { column { T.listbox
 			{
 				id = "units",
@@ -62,9 +62,9 @@
 				T.list_definition { unit_descriptor }
 			} } },
 
-			T.row { T.column { T.spacer { id = "fin_spacer", height = 30 } } },
+			row { T.column { T.spacer { id = "fin_spacer", height = 30 } } },
 
-			row { column { T.grid { row
+			row { T.column { horizontal_grow = true, T.grid { row
 			{
 				T.column { T.button { id = "profile", label = _"Profile" } },
 				T.column { horizontal_grow = true, grow_factor = 1, T.spacer { id = "left_button_spacer" } },

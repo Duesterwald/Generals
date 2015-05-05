@@ -34,10 +34,10 @@
 			},
 			row
 			{
-				column { linked_group = "des", T.spacer { horizontal_grow = true, grow_factor = 1 } },
 				column { T.button { id = "retreat", return_value = 1, label = _G"Retreat" } },
 				column { T.spacer { horizontal_grow = true, grow_factor = 1 } },
-				column { T.button { id = "ok", return_value = -1, label = _"OK" } }
+				column { T.spacer { horizontal_grow = true, grow_factor = 1 } },
+				column { horizontal_alignment = "right", T.button { id = "ok", return_value = -1, label = _"OK" } }
 			}
 		}
 	}

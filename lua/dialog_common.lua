@@ -26,7 +26,6 @@
 		if data.border == nil then data.border = "all" end
 		if data.border_size == nil then data.border_size = 5 end
 		if data.horizontal_alignment == nil then data.horizontal_alignment = "left" end
-		if data.horizontal_grow == nil then data.horizontal_grow = true end
 		return T.column(data)
 	end
 
