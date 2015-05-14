@@ -6,7 +6,7 @@
 	local atkdir = location[2] - location[1]
 
 	local map_center, map_dim = nil
-	local dy = round(2 + map_size/3)
+	local dy = round(2 + map_size/2)
 
 	if atkdir[1] == 0 then
 		local keep_offset = HexVec.new(round(1 + 4/3*map_size), dy)

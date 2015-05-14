@@ -58,7 +58,7 @@
 			row { column { T.listbox
 			{
 				id = "units",
-				T.header { unit_descriptor_header},
+				T.header { unit_descriptor_header },
 				T.list_definition { unit_descriptor }
 			} } },
 
