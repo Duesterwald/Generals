@@ -1,6 +1,6 @@
 <<
 	_ = wesnoth.textdomain("wesnoth")
-	_G = wesnoth.textdomain("generals")
+	G = wesnoth.textdomain("generals")
 	T = {}
 	setmetatable(T, { __index = function (self, key) return function(val) return { key, val } end end })
 

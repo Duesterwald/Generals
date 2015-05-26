@@ -474,16 +474,18 @@
 	Map = {}
 	Map._mt = {}
 
-	function Map.new(map_dimension)
+	function Map.new(map_dimension, border_size)
+		if border_size == nil then border_size = 1 end
 		local map = {}
-		for i = 0, map_dimension.x + 1 do
+		for i = 1-border_size, map_dimension.x + border_size do
 			map[i] = {}
-			for j = 0, map_dimension.y + 1 do
+			for j = 1-border_size, map_dimension.y + border_size do
 				map[i][j] = Terrain.new("Xv")
 			end
 		end
-		map._dimension_x = map_dimension.x + 1
-		map._dimension_y = map_dimension.y + 1
+		map._dimension_x = map_dimension.x
+		map._dimension_y = map_dimension.y
+		map._border_size = border_size
 		setmetatable(map, Map._mt)
 		return map
 	end
@@ -502,6 +504,7 @@
 	function Map._mt.__index(m, u)
 		if u == "x" then return rawget(m, "_dimension_x")
 		elseif u == "y" then return rawget(m, "_dimension_y")
+		elseif u == "b" then return rawget(m, "_border_size")
 		elseif Map._functions[u] ~= nil then return Map._functions[u]
 		elseif type(u) ~= "table" or getmetatable(u) ~= HexVec._mt then
 			error("Map-Error: tried to get value with non-HexVec key" .. u)
@@ -514,7 +517,20 @@
 	Map._functions =
 	{
 		contains = function(self, u)
-			return not (u.x < 0 or u.x > self.x or u.y < 0 or u.y > self.y)
+			return u.x > -self.b and u.x <= self.x+self.b and u.y > -self.b and u.y <= self.y+self.b
+		end,
+
+		coordinates = function(self)
+			local x, y = 1-self.b, 1-self.b
+			return function()
+				x = x+1
+				if x > self.x + self.b then
+					x = 1 - self.b
+					y = y + 1
+				end
+				if y > self.y + self.b then return nil end
+				return x, y
+			end
 		end,
 
 		set_code = function(self, position, code)
@@ -537,7 +553,7 @@
 	}
 
 	function Map._mt.__call(m, x, y)
-		if x < 0 or x > m.x or y < 0 or y > m.y then
+		if x < 1-m.b or x > m.x+m.b or y < 1-m.b or y > m.y+m.b then
 			return nil
 		end
 		return rawget(m, x)[y]
@@ -545,8 +561,8 @@
 
 	function Map._mt.__tostring(m)
 		local map_string = "border_size=1.\nusage=map\n\n"
-		for y = 0, m.y do
-			for x = 0, m.x - 1 do
+		for y = 1-m.b, m.y+m.b do
+			for x = 1-m.b, m.x+m.b - 1 do
 				map_string = map_string .. tostring(m(x, y)) .. ','
 			end
 			map_string = map_string .. tostring(m(m.x, y)) .. '\n'

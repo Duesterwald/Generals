@@ -52,7 +52,7 @@
 			row { T.column { horizontal_grow = true, T.label
 			{
 				definition = "title",
-				label = _G"Which units shall cover your retreat?"
+				label = G"Which units shall cover your retreat?"
 			} } },
 
 			row { T.column { horizontal_grow = true, T.grid { row { T.column { horizontal_grow = true, T.listbox

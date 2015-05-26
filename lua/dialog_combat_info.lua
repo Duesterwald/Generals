@@ -5,26 +5,26 @@
 		{
 			column { T.spacer { horizontal_grow = true, grow_factor = 1 } },
 			column { horizontal_alignment = "right", T.label { definition = "title", id = "attacker" } },
-			column { T.label { definition = "title", label = _G"vs." } },
+			column { T.label { definition = "title", label = G"vs." } },
 			column { T.label { definition = "title", id = "defender" } }
 		},
 		row
 		{
-			column { T.label { label = _G"Health" } },
+			column { T.label { label = G"Health" } },
 			column { horizontal_alignment = "right", T.label { id = "attacker_health" } },
 			column { T.spacer { horizontal_grow = true } },
 			column { T.label { id = "defender_health" } }
 		},
 		row
 		{
-			column { T.label { label = _G"Experience" } },
+			column { T.label { label = G"Experience" } },
 			column { horizontal_alignment = "right", T.label { id = "attacker_xp" } },
 			column { T.spacer { horizontal_grow = true } },
 			column { T.label { id = "defender_xp" } }
 		},
 		row
 		{
-			column { T.label { label = _G"Bloodlust" } },
+			column { T.label { label = G"Bloodlust" } },
 			column { horizontal_alignment = "right", T.label { id = "attacker_bloodlust" } },
 			column { T.spacer { horizontal_grow = true } },
 			column { T.label { id = "defender_bloodlust" } }
@@ -42,7 +42,7 @@
 
 			row { T.column { horizontal_grow = true, T.grid { row
 			{
-				column { T.button { id = "retreat", return_value = 1, label = _G"Retreat" } },
+				column { T.button { id = "retreat", return_value = 1, label = G"Retreat" } },
 				column { T.spacer { horizontal_grow = true, grow_factor = 1 } },
 				column { horizontal_alignment = "right", T.button { id = "ok", return_value = -1, label = _"OK" } }
 			} } } }

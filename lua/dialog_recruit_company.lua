@@ -53,7 +53,7 @@
 
 		T.grid
 		{
-			row { T.column { T.label { definition = "title", label = _G"Available Companies" } } },
+			row { T.column { T.label { definition = "title", label = G"Available Companies" } } },
 
 			row { column { T.listbox
 			{
@@ -79,7 +79,7 @@
 		T.helptip { id = "tooltip_large" },
 
 		T.grid { T.row { T.column { T.label {
-			label = _G"Not enough gold left for recruiting a company!"
+			label = G"Not enough gold left for recruiting a company!"
 		} } } }
 	}
 
