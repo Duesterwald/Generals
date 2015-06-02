@@ -71,25 +71,86 @@
 		}
 	}
 
+	Company._mt.functions =
+	{
+		hp = function(self)
+			local hu = self.hitpoints - self.unit_damage
+			if self.bl_damage == 0 then return tostring(hu)
+			else return hu - self.bl_damage .. " - " .. hu - math.ceil(self.bl_damage*0.75)
+			end
+		end,
+
+		unit_damage = function(self)
+			local ret = rawget(self, "unit_damage")
+			if ret == nil then return 0 else return ret end
+		end,
+
+		bl_damage = function(self)
+			local ret = rawget(self, "bl_damage")
+			if ret == nil then return 0 else return ret end
+		end,
+
+		bl = function(self)
+			local bl_q = self.bl_quenching
+			if bl_q == nil then return self.bloodlust
+			else return math.max(self.bloodlust - bl_q, 0)
+			end
+		end,
+
+		bl_quenching = function(self)
+			local ret = rawget(self, "bl_quenching")
+			if ret == nil then return 0 else return ret end
+		end,
+
+		xp = function(self)
+			local xpg = self.xp_gain
+			if xpg == nil then return self.experience
+			else return self.experience + xpg
+			end
+		end,
+
+		xp_gain = function(self)
+			local ret = rawget(self, "xp_gain")
+			if ret == nil then return 0 else return ret end
+		end
+	}
+
+	function Company._mt.__index(self, key)
+		local fun = Company._mt.functions[key]
+		if fun ~= nil then return fun(self)
+		else return nil
+		end
+	end
+
 	local att, def = nil
+	local winner, loser = nil
 	local side = nil
 	local units = nil
 	local cover_retreat = {}
 
-	local function update_cover(index)
-		cover_retreat[index] = wesnoth.get_dialog_value("units", index, "toggle")
-		local bl_quenching = units[index].__cfg.cost + units[index].experience
-		local winner, loser = att, def
-		if def.side ~= side then winner, loser = def, att end
-		if cover_retreat[index] then winner.bloodlust = winner.bloodlust - bl_quenching
-		else winner.bloodlust = winner.bloodlust + bl_quenching
-		end
+	local function update_combat_info()
 		wesnoth.set_dialog_value(att.hp.." / "..att.max_hitpoints, "attacker_health")
 		wesnoth.set_dialog_value(def.hp.." / "..def.max_hitpoints, "defender_health")
-		wesnoth.set_dialog_value(att.experience.." / "..att.max_experience, "attacker_xp")
-		wesnoth.set_dialog_value(def.experience.." / "..def.max_experience, "defender_xp")
-		wesnoth.set_dialog_value(att.bloodlust, "attacker_bloodlust")
-		wesnoth.set_dialog_value(def.bloodlust, "defender_bloodlust")
+		wesnoth.set_dialog_value(att.xp.." / "..att.max_experience, "attacker_xp")
+		wesnoth.set_dialog_value(def.xp.." / "..def.max_experience, "defender_xp")
+		wesnoth.set_dialog_value(att.bl, "attacker_bloodlust")
+		wesnoth.set_dialog_value(def.bl, "defender_bloodlust")
+	end
+
+	local function update_cover(index)
+		cover_retreat[index] = wesnoth.get_dialog_value("units", index, "toggle")
+		local cost = units[index].__cfg.cost
+		local uxp = units[index].experience
+		local bl_quenching = cost + uxp
+		if cover_retreat[index] then
+			loser.unit_damage = loser.unit_damage + math.floor(cost/2)
+			winner.bl_quenching = winner.bl_quenching + bl_quenching
+		else
+			loser.unit_damage = loser.unit_damage - math.floor(cost/2)
+			winner.bl_quenching = winner.bl_quenching - bl_quenching
+		end
+		loser.bl_damage = winner.bl
+		update_combat_info()
 	end
 
 	function show_retreat_dialog()
@@ -103,17 +164,19 @@
 			wesnoth.set_dialog_value(def.name, "defender")
 
 			side = wesnoth.get_variable("side_number")
+
+			winner, loser = att, def
+			if def.side ~= side then winner, loser = def, att end
+
+			loser.bl_damage = winner.bloodlust
+
 			units = wesnoth.get_units({side = side, canrecruit = false})
 			for i, unit in pairs(units) do
 				populate_unit_descriptor("units", i, unit)
 				wesnoth.set_dialog_callback(function() update_cover(i) end, "units", i, "toggle")
 			end
 
-			if att.side == side then att.min_damage = def.bloodlust
-			else def.min_damage = att.bloodlust
-			end
-
-			update_combat_info(att, def)
+			update_combat_info()
 		end
 
 		wesnoth.show_dialog(retreat_dialog, preshow)

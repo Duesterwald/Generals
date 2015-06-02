@@ -52,22 +52,10 @@
 	Company = {}
 	Company._mt = {}
 
-	function Company._mt.__index(self, key)
-		if key == "hp" then
-			local hp = self.hitpoints - self.unit_damage
-
-			return tostring(hp - self.max_damage) .. " - " .. tostring(hp - self.min_damage)
-		end
-
-		return nil
-	end
-
 	function Company.new(index)
 		local comp = wesnoth.get_variable("GN_COMPANY["..index.."].company")
 		setmetatable(comp, Company._mt)
 		comp.bloodlust = wesnoth.get_variable("GN_COMPANY["..index.."].bloodlust")
-		comp.unit_damage = 0
-		comp.bl_damage = 0
 		return comp
 	end
 
@@ -81,8 +69,8 @@
 			wesnoth.set_dialog_value(att.name, "attacker")
 			wesnoth.set_dialog_value(def.name, "defender")
 
-			wesnoth.set_dialog_value(att.hp.." / "..att.max_hitpoints, "attacker_health")
-			wesnoth.set_dialog_value(def.hp.." / "..def.max_hitpoints, "defender_health")
+			wesnoth.set_dialog_value(att.hitpoints.." / "..att.max_hitpoints, "attacker_health")
+			wesnoth.set_dialog_value(def.hitpoints.." / "..def.max_hitpoints, "defender_health")
 
 			wesnoth.set_dialog_value(att.experience.." / "..att.max_experience, "attacker_xp")
 			wesnoth.set_dialog_value(def.experience.." / "..def.max_experience, "defender_xp")
