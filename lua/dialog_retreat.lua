@@ -76,7 +76,7 @@
 		hp = function(self)
 			local hu = self.hitpoints - self.unit_damage
 			if self.bl_damage == 0 then return tostring(hu)
-			else return hu - self.bl_damage .. " - " .. hu - math.ceil(self.bl_damage*0.75)
+			else return hu - self.bl_damage .. " - " .. hu - math.ceil(self.bl_damage/2)
 			end
 		end,
 
@@ -143,10 +143,10 @@
 		local uxp = units[index].experience
 		local bl_quenching = cost + uxp
 		if cover_retreat[index] then
-			loser.unit_damage = loser.unit_damage + math.floor(cost/2)
+			loser.unit_damage = loser.unit_damage + math.floor(cost/4)
 			winner.bl_quenching = winner.bl_quenching + bl_quenching
 		else
-			loser.unit_damage = loser.unit_damage - math.floor(cost/2)
+			loser.unit_damage = loser.unit_damage - math.floor(cost/4)
 			winner.bl_quenching = winner.bl_quenching - bl_quenching
 		end
 		loser.bl_damage = winner.bl
@@ -170,7 +170,16 @@
 
 			loser.bl_damage = winner.bloodlust
 
-			units = wesnoth.get_units({side = side, canrecruit = false})
+			units = { indices = {}, wunits = wesnoth.get_units({side = side, canrecruit = false}) }
+			for index, unit in pairs(units.wunits) do
+				if unit.moves == unit.max_moves then
+					units.indices[#units.indices + 1] = index
+				end
+			end
+			setmetatable(units, {
+				__index = function(self, key) return self.wunits[self.indices[key]] end,
+				__call = function(self) local i = 0 return function() i = i + 1 if i > #self.indices then return nil else return i, self.wunits[indices[i]] })
+			cover_retreat = {}
 			for i, unit in pairs(units) do
 				populate_unit_descriptor("units", i, unit)
 				wesnoth.set_dialog_callback(function() update_cover(i) end, "units", i, "toggle")
@@ -179,6 +188,19 @@
 			update_combat_info()
 		end
 
-		wesnoth.show_dialog(retreat_dialog, preshow)
+		res = wesnoth.show_dialog(retreat_dialog, preshow)
+		if res == -1 then
+			wesnoth.set_variable("GN_RETREAT_DECISION", true)
+			wesnoth.set_variable("GN_COVERING_UNIT")
+			n = 0
+			for i, b in pairs(cover_retreat) do
+				if b then
+					wesnoth.set_variable(string.format("GN_COVERING_UNIT[%d]", n))
+					n = n + 1
+				end
+			end
+		else
+			wesnoth.set_variable("GN_RETREAT_DECISION", false)
+		end
 	end
 >>
