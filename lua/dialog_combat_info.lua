@@ -11,9 +11,9 @@
 		row
 		{
 			column { T.label { label = G"Health" } },
-			column { horizontal_alignment = "right", T.label { id = "attacker_health" } },
+			column { horizontal_alignment = "right", T.label { min_width = 500, id = "attacker_health" } },
 			column { T.spacer { horizontal_grow = true } },
-			column { T.label { id = "defender_health" } }
+			column { T.label { min_width = 500, id = "defender_health" } }
 		},
 		row
 		{

@@ -1,30 +1,35 @@
 <<
 function check_retreat_options()
 	local def_comp = wesnoth.get_variable("GN_DEFENDING_COMPANY")
-	print("check_retreat_options: ", def_comp)
 	def_comp = wesnoth.get_units({ { "filter_wml", { {"variables", { company = def_comp } } } } })[1]
-	print("check_retreat_options: ", def_comp.side)
 	local side = def_comp.side
 	local v = HexVec.new(def_comp.x, def_comp.y)
-	local dirs = { 1, 1, 1, 1, 1, 1}
+	local dirs = { true, true, true, true, true, true}
 	for i = 1,6 do
 		local va = v + adjacent_offset[i]
 		local unit = wesnoth.get_unit(va.x, va.y)
 		if unit ~= nil then
-			if unit.side ~= side then
-				dirs[i] = -4
-				dirs[left_to(i)] = dirs[left_to(i)] - 1
-				dirs[right_to(i)] = dirs[right_to(i)] - 1
-			else
-				dirs[i] = -4
-				dirs[left_to(i)] = dirs[left_to(i)] + 1
-				dirs[right_to(i)] = dirs[right_to(i)] + 1
+			dirs[i] = false
+		else
+			local possible = 0
+			for vaa in adjacent_tiles(va) do
+				local aunit = wesnoth.get_unit(vaa.x, vaa.y)
+				if aunit ~= nil then
+					if aunit.side == side then
+						possible = possible + 1
+					else
+						possible = possible - 1
+					end
+				end
+			end
+			if possible <= 0 then
+				dirs[i] = false
 			end
 		end
 	end
 
 	for i = 1, 6 do
-		if dirs[i] > 0 then
+		if dirs[i] then
 			wesnoth.set_variable("GN_RETREAT["..i.."].possible", true)
 			local va = v + adjacent_offset[i]
 			wesnoth.set_variable("GN_RETREAT["..i.."].x", va.x)

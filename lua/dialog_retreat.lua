@@ -178,9 +178,9 @@
 			end
 			setmetatable(units, {
 				__index = function(self, key) return self.wunits[self.indices[key]] end,
-				__call = function(self) local i = 0 return function() i = i + 1 if i > #self.indices then return nil else return i, self.wunits[indices[i]] })
+				__call = function(self) local i = 0 return function() i = i + 1 if i > #self.indices then return nil else return i, self.wunits[self.indices[i]] end end end })
 			cover_retreat = {}
-			for i, unit in pairs(units) do
+			for i, unit in units() do
 				populate_unit_descriptor("units", i, unit)
 				wesnoth.set_dialog_callback(function() update_cover(i) end, "units", i, "toggle")
 			end
