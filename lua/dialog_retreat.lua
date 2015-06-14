@@ -188,16 +188,25 @@
 			update_combat_info()
 		end
 
-		res = wesnoth.show_dialog(retreat_dialog, preshow)
-		if res == -1 then
+		local res = wesnoth.synchronize_choice( function()
+			local user_choice = wesnoth.show_dialog(retreat_dialog, preshow)
+			local ret_table = {}
+			if user_choice == -1 then
+				for i, cover in pairs(cover_retreat) do
+					if cover then
+						ret_table[#ret_table + 1] = { "id", { id = units[i].id } }
+					end
+				end
+			end
+			ret_table.user_choice = user_choice
+			return ret_table
+		end)
+
+		if res.user_choice == -1 then
 			wesnoth.set_variable("GN_RETREAT_DECISION", true)
 			wesnoth.set_variable("GN_COVERING_UNIT")
-			n = 0
-			for i, b in pairs(cover_retreat) do
-				if b then
-					wesnoth.set_variable(string.format("GN_COVERING_UNIT[%d]", n))
-					n = n + 1
-				end
+			for i, id in ipairs(res) do
+				wesnoth.set_variable(string.format("GN_COVERING_UNIT[%d].id", i-1), id[2].id)
 			end
 		else
 			wesnoth.set_variable("GN_RETREAT_DECISION", false)

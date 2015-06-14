@@ -101,29 +101,32 @@
 			if gold_left >= company_type.cost then table.insert(company_id, i) end
 		end
 
-		local li = 0
-		if #company_id == 0 then
-			wesnoth.show_dialog(too_little_gold)
-		else
-			local function preshow()
-				for j, i in ipairs(company_id) do
-					populate_company_info("companies", j, company_types[i])
+		local result = wesnoth.synchronize_choice( function()
+			local li = 0
+			if #company_id == 0 then
+				wesnoth.show_dialog(too_little_gold)
+			else
+				local function preshow()
+					for j, i in ipairs(company_id) do
+						populate_company_info("companies", j, company_types[i])
+					end
+					wesnoth.set_dialog_callback(company_profile, "profile")
 				end
-				wesnoth.set_dialog_callback(company_profile, "profile")
-			end
 
-			local function postshow()
-				li = wesnoth.get_dialog_value("companies")
-			end
+				local function postshow()
+					li = wesnoth.get_dialog_value("companies")
+				end
 
-			if wesnoth.show_dialog(company_type_chooser, preshow, postshow) == -2 then
-				li = 0
+				if wesnoth.show_dialog(company_type_chooser, preshow, postshow) == -2 then
+					li = 0
+				end
 			end
-		end
+			print(li, company_types[company_id[li]].id)
+			if li ~= 0 then return { company = company_types[company_id[li]].id } else return nil end
+		end)
 
-		local result = ""
-		if li ~= 0 then result = company_types[company_id[li]].id end
-		wesnoth.set_variable(variable, result)
+		print(result.company)
+		wesnoth.set_variable(variable, result.company)
 	end
 
 	print("dialog_recruit_company.lua loaded")

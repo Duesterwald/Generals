@@ -4,7 +4,7 @@ function check_retreat_options()
 	def_comp = wesnoth.get_units({ { "filter_wml", { {"variables", { company = def_comp } } } } })[1]
 	local side = def_comp.side
 	local v = HexVec.new(def_comp.x, def_comp.y)
-	local dirs = { true, true, true, true, true, true}
+	local dirs = { true, true, true, true, true, true }
 	for i = 1,6 do
 		local va = v + adjacent_offset[i]
 		local unit = wesnoth.get_unit(va.x, va.y)

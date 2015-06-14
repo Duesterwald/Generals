@@ -60,27 +60,29 @@
 	end
 
 	function show_combat_info()
-		local function preshow()
-			local att = wesnoth.get_variable("GN_ATTACKING_COMPANY")
-			att = Company.new(att)
-			local def = wesnoth.get_variable("GN_DEFENDING_COMPANY")
-			def = Company.new(def)
+		wesnoth.synchronize_choice( function()
+			local function preshow()
+				local att = wesnoth.get_variable("GN_ATTACKING_COMPANY")
+				att = Company.new(att)
+				local def = wesnoth.get_variable("GN_DEFENDING_COMPANY")
+				def = Company.new(def)
 
-			wesnoth.set_dialog_value(att.name, "attacker")
-			wesnoth.set_dialog_value(def.name, "defender")
+				wesnoth.set_dialog_value(att.name, "attacker")
+				wesnoth.set_dialog_value(def.name, "defender")
 
-			wesnoth.set_dialog_value(att.hitpoints.." / "..att.max_hitpoints, "attacker_health")
-			wesnoth.set_dialog_value(def.hitpoints.." / "..def.max_hitpoints, "defender_health")
+				wesnoth.set_dialog_value(att.hitpoints.." / "..att.max_hitpoints, "attacker_health")
+				wesnoth.set_dialog_value(def.hitpoints.." / "..def.max_hitpoints, "defender_health")
 
-			wesnoth.set_dialog_value(att.experience.." / "..att.max_experience, "attacker_xp")
-			wesnoth.set_dialog_value(def.experience.." / "..def.max_experience, "defender_xp")
+				wesnoth.set_dialog_value(att.experience.." / "..att.max_experience, "attacker_xp")
+				wesnoth.set_dialog_value(def.experience.." / "..def.max_experience, "defender_xp")
 
-			wesnoth.set_dialog_value(att.bloodlust, "attacker_bloodlust")
-			wesnoth.set_dialog_value(def.bloodlust, "defender_bloodlust")
-		end
+				wesnoth.set_dialog_value(att.bloodlust, "attacker_bloodlust")
+				wesnoth.set_dialog_value(def.bloodlust, "defender_bloodlust")
+			end
 
-		if wesnoth.show_dialog(combat_info_dialog, preshow) == 1 then
-			show_retreat_dialog()
-		end
+			if wesnoth.show_dialog(combat_info_dialog, preshow) == 1 then
+				show_retreat_dialog()
+			end
+		end)
 	end
 >>

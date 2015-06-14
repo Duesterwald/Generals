@@ -149,12 +149,16 @@
 			li = wesnoth.get_dialog_value "units"
 		end
 
-		local r = wesnoth.show_dialog(company_info_dialog, preshow, postshow)
+		local r = wesnoth.synchronize_choice(function()
+			return { val = wesnoth.show_dialog(company_info_dialog, preshow, postshow) }
+		end).val
 		while r == 1 and #units > 0 do
 			if side == captain.side then
 				wesnoth.set_variable(gn_company .. ".unit["..(li-1).."]", nil)
 			end
-			r = wesnoth.show_dialog(company_info_dialog, preshow, postshow)
+			r = wesnoth.synchronize_choice(function()
+				return { val = wesnoth.show_dialog(company_info_dialog, preshow, postshow) }
+			end).val
 		end
 
 		wesnoth.message(string.format("Button %d pressed. Item %d selected.", r, li))
