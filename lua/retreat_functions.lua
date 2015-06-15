@@ -8,7 +8,7 @@ function check_retreat_options()
 	for i = 1,6 do
 		local va = v + adjacent_offset[i]
 		local unit = wesnoth.get_unit(va.x, va.y)
-		if unit ~= nil then
+		if unit ~= nil or wesnoth.unit_movement_cost(def_comp, wesnoth.get_terrain(va.x, va.y)) == 99 then
 			dirs[i] = false
 		else
 			local possible = 0
