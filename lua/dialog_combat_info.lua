@@ -42,7 +42,6 @@
 
 			row { T.column { horizontal_grow = true, T.grid { row
 			{
-				column { T.button { id = "retreat", return_value = 1, label = G"Retreat" } },
 				column { T.spacer { horizontal_grow = true, grow_factor = 1 } },
 				column { horizontal_alignment = "right", T.button { id = "ok", return_value = -1, label = _"OK" } }
 			} } } }
@@ -59,7 +58,7 @@
 		return comp
 	end
 
-	function show_combat_info()
+	function show_combat_info(side)
 		wesnoth.synchronize_choice( function()
 			local function preshow()
 				local att = wesnoth.get_variable("GN_ATTACKING_COMPANY")
@@ -80,9 +79,7 @@
 				wesnoth.set_dialog_value(def.bloodlust, "defender_bloodlust")
 			end
 
-			if wesnoth.show_dialog(combat_info_dialog, preshow) == 1 then
-				show_retreat_dialog()
-			end
+			wesnoth.show_dialog(combat_info_dialog, preshow)
 		end)
 	end
 >>

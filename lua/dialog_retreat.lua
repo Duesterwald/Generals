@@ -169,6 +169,9 @@
 			if def.side ~= side then winner, loser = def, att end
 
 			loser.bl_damage = winner.bloodlust
+			local total_loot = wesnoth.get_variable("GN_TOTAL_LOOT")
+			if total_loot == nil then total_loot = 0 end
+			winner.unit_damage = -total_loot
 
 			units = { indices = {}, wunits = wesnoth.get_units({side = side, canrecruit = false}) }
 			for index, unit in pairs(units.wunits) do
