@@ -5,6 +5,7 @@
 		column { T.label  { linked_group = "typ", id = "header_type",  label = _"Type"} },
 		column { T.label  { linked_group = "nam", id = "header_name",  label = _"Name" } },
 		column { T.label  { linked_group = "lvl", id = "header_level", label = _"Level" } },
+		column { T.label  { linked_group = "cst", id = "header_cost", label = _"Cost" } },
 		column { T.label  { linked_group = "exp", id = "header_exp",   label = _"XP" } }
 	}
 
@@ -18,6 +19,7 @@
 				column { T.label { linked_group = "typ", id = "type" } },
 				column { T.label { linked_group = "nam", id = "name" } },
 				column { T.label { linked_group = "lvl", id = "level" } },
+				column { T.label { linked_group = "cst", id = "cost" } },
 				column { T.label { linked_group = "exp", id = "exp" } }
 			} }
 		}
@@ -29,6 +31,7 @@
 		wesnoth.set_dialog_value(wesnoth_variable.type,  list, index, "type")
 		wesnoth.set_dialog_value(wesnoth_variable.name,  list, index, "name")
 		wesnoth.set_dialog_value(wesnoth_variable.__cfg.level, list, index, "level")
+		wesnoth.set_dialog_value(wesnoth_variable.__cfg.cost, list, index, "cost")
 		wesnoth.set_dialog_value(wesnoth_variable.experience .. "/" .. wesnoth_variable.max_experience,
 			list, index, "exp")
 	end
@@ -43,6 +46,7 @@
 		T.linked_group { id = "typ", fixed_width = true },
 		T.linked_group { id = "nam", fixed_width = true },
 		T.linked_group { id = "lvl", fixed_width = true },
+		T.linked_group { id = "cst", fixed_width = true },
 		T.linked_group { id = "exp", fixed_width = true },
 
 		T.grid
@@ -122,6 +126,11 @@
 		end
 	end
 
+	local function death_xp(level)
+		if level == 0 then return 4 end
+		return 8 * level
+	end
+
 	local att, def = nil
 	local winner, loser = nil
 	local side = nil
@@ -141,13 +150,15 @@
 		cover_retreat[index] = wesnoth.get_dialog_value("units", index, "toggle")
 		local cost = units[index].__cfg.cost
 		local uxp = units[index].experience
-		local bl_quenching = cost + uxp
+		local bl_quenching = cost + 3*uxp
 		if cover_retreat[index] then
-			loser.unit_damage = loser.unit_damage + math.floor(cost/4)
+			loser.unit_damage = loser.unit_damage + math.floor(cost/3)
 			winner.bl_quenching = winner.bl_quenching + bl_quenching
+			winner.xp_gain = winner.xp_gain + death_xp(units[index].__cfg.level)
 		else
-			loser.unit_damage = loser.unit_damage - math.floor(cost/4)
+			loser.unit_damage = loser.unit_damage - math.floor(cost/3)
 			winner.bl_quenching = winner.bl_quenching - bl_quenching
+			winner.xp_gain = winner.xp_gain - death_xp(units[index].__cfg.level)
 		end
 		loser.bl_damage = winner.bl
 		update_combat_info()
