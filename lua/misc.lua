@@ -7,10 +7,6 @@
 
 	hex_area = 3 * (map_size * map_size + map_size)
 
-	max_num_feature =  hex_area * wesnoth.get_variable("GN_LOCAL_FEATURE_DENSITY") / 100
-
-	max_feature_length = map_size * wesnoth.get_variable("GN_LOCAL_FEATURE_SIZE") / 100
-
 	num_villages = hex_area * wesnoth.get_variable("GN_LOCAL_VILLAGE_DENSITY") / 1000
 
 	keep_size = wesnoth.get_variable("GN_LOCAL_KEEP_SIZE")
