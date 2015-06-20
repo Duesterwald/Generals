@@ -25,14 +25,14 @@
 		}
 	} }
 
-	local function populate_unit_descriptor(list, index, wesnoth_variable)
+	local function populate_unit_descriptor(list, index, unit)
 		wesnoth.set_dialog_value(false, list, index, "toggle")
-		wesnoth.set_dialog_value(wesnoth_variable.__cfg.image, list, index, "icon")
-		wesnoth.set_dialog_value(wesnoth_variable.type,  list, index, "type")
-		wesnoth.set_dialog_value(wesnoth_variable.name,  list, index, "name")
-		wesnoth.set_dialog_value(wesnoth_variable.__cfg.level, list, index, "level")
-		wesnoth.set_dialog_value(wesnoth_variable.__cfg.cost, list, index, "cost")
-		wesnoth.set_dialog_value(wesnoth_variable.experience .. "/" .. wesnoth_variable.max_experience,
+		wesnoth.set_dialog_value(unit.__cfg.image.."~TC("..unit.side..",magenta)", list, index, "icon")
+		wesnoth.set_dialog_value(unit.type,  list, index, "type")
+		wesnoth.set_dialog_value(unit.name,  list, index, "name")
+		wesnoth.set_dialog_value(unit.__cfg.level, list, index, "level")
+		wesnoth.set_dialog_value(unit.__cfg.cost, list, index, "cost")
+		wesnoth.set_dialog_value(unit.experience .. "/" .. unit.max_experience,
 			list, index, "exp")
 	end
 

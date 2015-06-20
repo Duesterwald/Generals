@@ -30,13 +30,13 @@
 		}
 	} }
 
-	local function populate_company_info(list, index, wesnoth_variable)
-		wesnoth.set_dialog_value(wesnoth_variable.__cfg.image,   list, index, "icon")
-		wesnoth.set_dialog_value(wesnoth_variable.name,          list, index, "name")
-		wesnoth.set_dialog_value(wesnoth_variable.cost,          list, index, "cost")
-		wesnoth.set_dialog_value(wesnoth_variable.level,         list, index, "level")
-		wesnoth.set_dialog_value(wesnoth_variable.max_hitpoints, list, index, "health")
-		wesnoth.set_dialog_value(wesnoth_variable.max_moves,     list, index, "moves")
+	local function populate_company_info(list, index, unit)
+		wesnoth.set_dialog_value(unit.__cfg.image.."~TC("..unit.side..",magenta)",   list, index, "icon")
+		wesnoth.set_dialog_value(unit.name,          list, index, "name")
+		wesnoth.set_dialog_value(unit.cost,          list, index, "cost")
+		wesnoth.set_dialog_value(unit.level,         list, index, "level")
+		wesnoth.set_dialog_value(unit.max_hitpoints, list, index, "health")
+		wesnoth.set_dialog_value(unit.max_moves,     list, index, "moves")
 	end
 
 	local company_type_chooser =

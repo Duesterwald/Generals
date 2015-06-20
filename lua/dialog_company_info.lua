@@ -22,12 +22,12 @@
 		}
 	} }
 
-	local function populate_unit_descriptor(list, index, wesnoth_variable)
-		wesnoth.set_dialog_value(wesnoth_variable.image, list, index, "icon")
-		wesnoth.set_dialog_value(wesnoth_variable.type,  list, index, "type")
-		wesnoth.set_dialog_value(wesnoth_variable.name,  list, index, "name")
-		wesnoth.set_dialog_value(wesnoth_variable.level, list, index, "level")
-		wesnoth.set_dialog_value(wesnoth_variable.experience .. "/" .. wesnoth_variable.max_experience,
+	local function populate_unit_descriptor(list, index, unit)
+		wesnoth.set_dialog_value(unit.image.."~TC("..unit.side..",magenta)", list, index, "icon")
+		wesnoth.set_dialog_value(unit.type,  list, index, "type")
+		wesnoth.set_dialog_value(unit.name,  list, index, "name")
+		wesnoth.set_dialog_value(unit.level, list, index, "level")
+		wesnoth.set_dialog_value(unit.experience .. "/" .. unit.max_experience,
 			list, index, "exp")
 	end
 
@@ -84,6 +84,7 @@
 	local no_units_place_holder = 
 	{
 		image = "",
+		side = "",
 		type = "No units recruited yet",
 		name = "", 
 		level = "",
