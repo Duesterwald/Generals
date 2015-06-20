@@ -122,46 +122,48 @@
 	end
 
 	function show_company(index, side)
-		local function preshow()
-			gn_company = "GN_COMPANY["..index.."]"
-			captain = wesnoth.get_variable(gn_company .. ".captain")
-			populate_unit_descriptor("captain", 1, captain)
-			wesnoth.set_dialog_callback(select_captain, "captain")
-
-			units = {}
-			local num_units = wesnoth.get_variable(gn_company .. ".unit.length")
-			if num_units > 0 then
-				for i = 1, num_units do
-					local unit = wesnoth.get_variable(string.format("%s[%d]", gn_company .. ".unit", i - 1))
-					units[#units+1] = unit
-					populate_unit_descriptor("units", i, unit)
-				end
-				wesnoth.set_dialog_callback(select_unit, "units")
-			else
-				populate_unit_descriptor("units", 1, no_units_place_holder )
+		gn_company = "GN_COMPANY["..index.."]"
+		captain = wesnoth.get_variable(gn_company .. ".captain")
+		units = {}
+		local num_units = wesnoth.get_variable(gn_company .. ".unit.length")
+		if num_units > 0 then
+			for i = 1, num_units do
+				local unit = wesnoth.get_variable(string.format("%s[%d]", gn_company .. ".unit", i - 1))
+				units[#units+1] = unit
 			end
-
-			wesnoth.set_dialog_callback(profile, "profile")
-		end
-
-		local li = 0
-		local function postshow()
-			li = wesnoth.get_dialog_value "units"
 		end
 
 		local r = wesnoth.synchronize_choice(function()
-			return { val = wesnoth.show_dialog(company_info_dialog, preshow, postshow) }
-		end).val
-		while r == 1 and #units > 0 do
-			if side == captain.side then
-				wesnoth.set_variable(gn_company .. ".unit["..(li-1).."]", nil)
-			end
-			r = wesnoth.synchronize_choice(function()
-				return { val = wesnoth.show_dialog(company_info_dialog, preshow, postshow) }
-			end).val
-		end
+			local function preshow()
+				populate_unit_descriptor("captain", 1, captain)
+				wesnoth.set_dialog_callback(select_captain, "captain")
 
-		wesnoth.message(string.format("Button %d pressed. Item %d selected.", r, li))
+				if num_units > 0 then
+					for i = 1, num_units do
+						populate_unit_descriptor("units", i, unit)
+					end
+					wesnoth.set_dialog_callback(select_unit, "units")
+				else
+					populate_unit_descriptor("units", 1, no_units_place_holder )
+				end
+
+				wesnoth.set_dialog_callback(profile, "profile")
+			end
+
+			local li = 0
+			local function postshow()
+				li = wesnoth.get_dialog_value "units"
+			end
+
+			return { val = wesnoth.show_dialog(company_info_dialog, preshow, postshow), li = li }
+		end)
+
+		if r.val == 1 and #units > 0 then
+			if side == captain.side then
+				wesnoth.set_variable(gn_company .. ".unit["..(r.li-1).."]", nil)
+			end
+			show_company(index, side)
+		end
 	end
 
 	print("dialog_company_info.lua loaded")
