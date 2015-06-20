@@ -1,6 +1,25 @@
 # Generals
 Battle for Wesnoth: Generals -- Multiplayer PvP Pseudo Campaign
 
+Installation guide
+
+Since this add-on is not yet ready and available on the add-on server, you will need to follow these
+instructions in order to play:
+
+1) To find out where to install:
+  a) Start Battle for Wesnoth and click "Preferences"
+  b) Click "Paths"
+  c) Remember the path noted after "Add-ons:"
+  
+2) If you are using git, clone this repository to the path you found out in 1c).
+   Otherwise, install all files in a subdirectory "add-ons-path/Generals". Make
+   sure, that there is no additional subdirectory present. For instance, you
+   need a file "add-ons-path/Generals/_main.cfg".
+
+3) Restart Battle for Wesnoth and start a Multiplayer game. You should now be able
+   select "Generals" as possible add-on. If you use additional add-ons, I would be
+   glad for feedback as to whether they are compatible or not ;-)
+
 I have been working on an add-on, which simulates a PvP "campaign" mode. The idea is, that there are is 
 a global mode, on which players move their companies, and if two companies clash, the game enters the 
 local mode, in which the participating players move their units like in a normal BfW game.
